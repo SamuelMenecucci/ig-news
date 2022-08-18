@@ -14,8 +14,6 @@ export default class MyDocument extends Document {
             href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Roboto:wght@900&display=swap"
             rel="stylesheet"
           />
-
-          <title>ig.news</title>
         </Head>
         <body>
           {/* main is where div root used to be */}

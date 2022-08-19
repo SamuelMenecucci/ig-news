@@ -1,0 +1,44 @@
+.contentContainer {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 2rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  height: calc(
+    100vh - 5rem
+  ); //makes the height of this home content element the full height of the screen, so, 100 viewport height minus 5rem, because 5rem is the height of my header. this way, it will be vertically centered on the screen, discounting the height of the header, keeping the same distance from the header and the end of the screen, avoiding unnecessary scrolling
+}
+
+.hero {
+  max-width: 520px;
+
+  //with > selector I take only the direct child, ignoring those that have other parent
+  > span {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  h1 {
+    font-size: 4.5rem;
+    line-height: 4.5rem;
+    font-weight: 900;
+    margin-top: 2.5rem;
+    span {
+      color: var(--cyan-500);
+    }
+  }
+
+  p {
+    font-size: 1.5rem;
+    line-height: 2.25rem;
+    margin-top: 1.5rem;
+
+    span {
+      color: var(--cyan-500);
+      font-weight: bold;
+    }
+  }
+}

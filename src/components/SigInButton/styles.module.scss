@@ -22,8 +22,8 @@
       margin-right: 1rem;
     }
 
-    //I pass what icon I want to have a margin-right. I'm passing the last-child because in button I have two icons, but I wanna apply the margin only on the last
-    &:last-child {
+    //here I'll take the next svg that's in my class .signInButton, ignoring the first. So, the style will be apply in every svg that's following the first.
+    & + svg {
       margin-left: 1rem;
     }
   }

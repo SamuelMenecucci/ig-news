@@ -1,0 +1,36 @@
+.signInButton {
+  height: 3rem;
+  border-radius: 3rem; //if I put the same value on border-radius that is in height, the border will be as rounded as possible
+  background: var(--gray-850);
+  border: 0;
+  padding: 0 1.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--white);
+  font-weight: bold;
+
+  //I have an svg icon, so I can style it through the svg selector. when I want to change the size, I need to pass width height
+  svg {
+    width: 20px;
+    height: 20px;
+
+    //I pass what icon I want to have a margin-right. I'm passing the first-child because in button I have two icons, but I wanna apply the margin only on the first
+    &:first-child {
+      margin-right: 1rem;
+    }
+
+    //I pass what icon I want to have a margin-right. I'm passing the last-child because in button I have two icons, but I wanna apply the margin only on the last
+    &:last-child {
+      margin-left: 1rem;
+    }
+  }
+
+  transition: filter 0.2s;
+
+  &:hover {
+    filter: brightness(0.8);
+  }
+}

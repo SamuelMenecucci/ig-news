@@ -1,4 +1,4 @@
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, GetStaticProps } from "next";
 import Head from "next/head";
 import { SubscribeButton } from "../components/SubscribeButton";
 import { stripe } from "../services/stripe";
@@ -46,8 +46,10 @@ export default function Home({ product }: HomeProps) {
 //the getServerSideProps is a way to make a call from  server side rendering.
 //the getServerSideProps name is mandatory, just as the function on a const is also
 //DOC https://nextjs.org/docs/basic-features/data-fetching/get-server-side-props
-export const getServerSideProps: GetServerSideProps = async () => {
-  //todo código dentro dessa função é executado no servidor node que o next sobe, para fazer o ssr, ou seja, se eu der um console log aqui, ele não irá aparecer no browser, justamente por não ser client side rendering, e sim server side rendering. esse console.log será exibido no terminal que está exibindo o servidor rodando da aplicação
+//if I want to use SSG (Static Site Generation), the only thing I need to change is: change the name of the const to getStaticProps and the type to the same.
+//When I use Static Site Generation, instead next server make a call every time that a user use the application, he will generate a static html file whit all informations that was returned from server on the first call. so, every user will see this static html file. the static html file will update using the time (in seconds) of the revalidate property, that i need to pass when I use the getStaticProps
+export const getStaticProps: GetStaticProps = async () => {
+  //all code inside this function is executed on the node server that next runs, here works the ssr. if I give a console.log here, will not appear in the browser, precisely because is not client side rendering, but server side rendering. this console.log will be displayed in the terminal where I put "yarn dev"
 
   //since I'm not using http calls with axios or fetch to consume a route, but a library, when I use stripe. (dot) I already have all the information that I can fet directly, without putting the route completely.
   //DOC https://stripe.com/docs/api
@@ -66,5 +68,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
     props: {
       product,
     },
+    revalidate: 60 * 60 * 24, //revalidate tells how long (in seconds) I want this page to hold without needing to be revalidated (rebuild)
   };
 };

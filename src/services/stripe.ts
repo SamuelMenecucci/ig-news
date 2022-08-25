@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { version } from "../../package.json";
+import packageJson from "../../package.json";
 
 //the first parameter is the private key, the second is an object with required configurations of stripe.
 export const stripe = new Stripe(process.env.STRIPE_API_KEY, {
@@ -10,6 +10,6 @@ export const stripe = new Stripe(process.env.STRIPE_API_KEY, {
     name: "ignews",
 
     //in version I can import the application version directly from package.json
-    version: version,
+    version: packageJson.version,
   },
 });

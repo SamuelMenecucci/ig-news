@@ -28,11 +28,30 @@ export default NextAuth({
       try {
         //to make a query whit fauna, i need to user .query function from my fauna service
         await fauna.query(
-          //to create a new query, i need to use Create function, from query, that I have import from faunadb. the Create expects 2 params: the collection ref, witch I need to passas Collection() with the name of my collection,  and as second a object, that have data key, and receives what I will record in database
+          //Evaluates an expression. If expects 3 parameters, firs is the condition, second is what will happens if returns true, third is whats will happens if not
+          q.If(
+            //Returns the opposite of a boolean expression.
+            q.Not(
+              //Returns true if a document has an event at a specific time.
+              q.Exists(
+                //Returns the set of items that match search terms.
+                q.Match(
+                  //using the index that I created in faunaDB.Returns the ref for an index.
+                  q.Index("user_by_email"),
+                  //casefold converts a string into a case-normalized string.
+                  q.Casefold(email)
+                )
+              )
+            ),
 
-          q.Create(q.Collection("users"), {
-            data: { email },
-          })
+            //to create a new query, i need to use Create function, from query, that I have import from faunadb. the Create expects 2 params: the collection ref, witch I need to passas Collection() with the name of my collection,  and as second a object, that have data key, and receives what I will record in database
+            q.Create(q.Collection("users"), {
+              data: { email },
+            }),
+
+            //Get retrieves the document for the specified reference.
+            q.Get(q.Match(q.Index("user_by_email"), q.Casefold(email)))
+          )
         );
 
         //the signIn callback returns true if everything its ok, and false if not

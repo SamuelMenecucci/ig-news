@@ -25,8 +25,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       line_items: [{ price: "price_1LYZMOBJ8OywdlWv2pLyLiAL", quantity: 1 }], //Array with the objects referring to the purchase. In "price" I pass the id of the product that will be purchased, the id references the product id in stripe panel
       mode: "subscription", //mode refers to the payment being a subscription service.
       allow_promotion_codes: true, //to allow promotion codes that change the price
-      success_url: "http://localhost:3000/posts", //url that the user will be redirected if the payment has been made
-      cancel_url: "http://localhost:3000/", //url that the user will be redirected if the payment has be canceled
+      success_url: process.env.STRIPE_SUCCESS_URL, //url that the user will be redirected if the payment has been made
+      cancel_url: process.env.STRIPE_CANCEL_URL, //url that the user will be redirected if the payment has be canceled
     });
 
     return res.status(200).json({ sessionId: stripeCheckoutSession.id }); //I'm returning as an id because i'm going to use the stripe api to convert this id into a url, and the user will be directed to this url and then will be redirected back.

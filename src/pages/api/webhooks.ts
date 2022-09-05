@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { Readable } from "stream";
 import { Stripe } from "stripe";
 import { stripe } from "../../services/stripe";
+import { saveSubscription } from "./_lib/manageSubscription";
 
 //as the stripe sends the webhooks using the streaming format, I need to convert it in a way so that I can use it within node
 async function buffer(readable: Readable) {
@@ -32,7 +33,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     //per the stripe documentation, it is exactly this field that is sent when the stripe uses the webhook route
     const secret = req.headers["stripe-signature"];
 
-    //crio uma variável do tipo Event do stripe.
+    //I create a variable o type Event from the stripe
     let event: Stripe.Event;
 
     //I put the assignment of this variable inside a try catch, which will be done by a stripe function (which is a function of the tripe instance of my services), passing as a parameter the request that comes in converted streaming, the secret that I got it from my headers and the stripe CLI code that is inside my .env
@@ -50,7 +51,28 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const type = event.type;
 
     if (relevantEvents.has(type)) {
-      console.log(`Received event ${event}`);
+      console.log(event);
+      try {
+        switch (type) {
+          case "checkout.session.completed":
+            //when creating the event variable, I type it as Stripe.Event. This type is a generic type of stripe events, so, as I'm  working with the checkout.session event, I will create another variable with the type of checkout.session, so I will direct all the fields present within the variable
+            const checkoutSession = event.data
+              .object as Stripe.Checkout.Session; //I put event.data.object because it is the property that comes from the request with all the data that I will need
+
+            await saveSubscription(
+              checkoutSession.subscription.toString(),
+              checkoutSession.customer.toString()
+            );
+            break;
+
+          default:
+            //in case the event that is returned is not within the events I expected
+            throw new Error("Unhandled event");
+        }
+      } catch (erros) {
+        //I don't give an error return because this return will be given to the stripe, and if it sees an error, it will keep trying to make the request again later.
+        return res.json({ error: "Webhook handler failed" });
+      }
     }
 
     res.status(200).json({ received: true });

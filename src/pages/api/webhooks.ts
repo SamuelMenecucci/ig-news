@@ -23,8 +23,12 @@ export const config = {
   api: { bodyParser: false },
 };
 
-//putting stripe events that are relevant to my application into a variable. this checkout.session.completed is what I will use.
-const relevantEvents = new Set(["checkout.session.completed"]);
+//putting stripe events that are relevant to my application into a variable. this checkout.session.completed is what I will use to know when a user subscription was paid.
+const relevantEvents = new Set([
+  "checkout.session.completed",
+  "customer.subscription.updated",
+  "customer.subscription.deleted",
+]);
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -51,9 +55,23 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const type = event.type;
 
     if (relevantEvents.has(type)) {
-      console.log(event);
       try {
         switch (type) {
+          //as I will use the same logic for both events, I can use cases this way
+          case "customer.subscription.updated":
+          case "customer.subscription.deleted":
+            const subscription = event.data.object as Stripe.Subscription;
+
+            await saveSubscription(
+              subscription.id,
+              subscription.customer.toString(),
+              false
+            );
+
+            break;
+
+          //ouvindo o evento de checkout.session.completed
+          //listening to checkout.session.completed event
           case "checkout.session.completed":
             //when creating the event variable, I type it as Stripe.Event. This type is a generic type of stripe events, so, as I'm  working with the checkout.session event, I will create another variable with the type of checkout.session, so I will direct all the fields present within the variable
             const checkoutSession = event.data
@@ -61,7 +79,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
             await saveSubscription(
               checkoutSession.subscription.toString(),
-              checkoutSession.customer.toString()
+              checkoutSession.customer.toString(),
+              true
             );
             break;
 

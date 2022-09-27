@@ -20,6 +20,42 @@ export default NextAuth({
   //next-auth brings some callbacks functions that we can use to control what happens when an action is performed
   //callbacks doc https://next-auth.js.org/configuration/callbacks
   callbacks: {
+    //this callback allows us to modify the data that is inside the session, which is where the user's session data is stored, and we can access it anywhere in our application
+    async session({ session }) {
+      try {
+        const userActiveSubscription = await fauna.query(
+          q.Get(
+            q.Intersection([
+              q.Match(
+                q.Index("subscription_by_user_ref"),
+                q.Select(
+                  "ref",
+                  q.Get(
+                    q.Match(
+                      q.Index("user_by_email"),
+                      q.Casefold(session.user.email)
+                    )
+                  )
+                )
+              ),
+              q.Match(q.Index("subscription_by_status"), "active"),
+            ])
+          )
+        );
+
+        return {
+          ...session,
+          //adding a property inside the session
+          activeSubscription: userActiveSubscription,
+        };
+      } catch {
+        return {
+          ...session,
+          activeSubscription: null,
+        };
+      }
+    },
+
     //the signIn callback will be triggered as soon as the user log in
     async signIn({ user, account, profile }) {
       const { email } = user; //destructuring email from user

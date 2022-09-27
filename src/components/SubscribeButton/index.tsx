@@ -1,4 +1,5 @@
 import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
 import { api } from "../../services/api";
 import { getStripeJs } from "../../services/stripejs";
 import styles from "./styles.module.scss";
@@ -11,9 +12,17 @@ export function SubscribeButton({ priceId }: SubscribeButtonProps) {
   //before I redirect the user to checkout session, I need to check if he is loggedIn on my app
   const session = useSession();
 
+  const router = useRouter();
+
   async function handleSubscribe() {
     if (session.status === "unauthenticated") {
       signIn("github");
+      return;
+    }
+
+    if (session.data.activeSubscription) {
+      //whenever I need to redirect the user programmatically, by a function and not by a button he clicks or something, I always use useRouter
+      router.push("/posts");
       return;
     }
 

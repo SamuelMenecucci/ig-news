@@ -18,7 +18,7 @@ export default function Post({ post }: PostProps) {
   return (
     <>
       <Head>
-        <title>{post.title} | ig.news</title>
+        <title>| ig.news</title>
       </Head>
 
       <main className={styles.container}>
@@ -44,9 +44,19 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const { slug } = params;
 
+  if (!session.activeSubscription) {
+    return {
+      //if I wanted to redirect the user to another place in my application, I just don't return the props and instead return the redirect.
+      redirect: {
+        destination: "/", //step the destination that the user will be redirected to
+        permanent: false, //so that the search engine understand that the redirect is not because the page doesn't exists,but because it was due to lak of access or something like that
+      },
+    };
+  }
+
   const prismic = getPrismicClient(req);
 
-  const response = await prismic.getByUID("post", String(slug), {}); //is a method that exists inside prismic. it is for me to search for any document by its UID (which is exactly the slyg). I pass the type of the document I want to fetch and pass the value
+  const response = await prismic.getByUID("post", String(slug), {}); //is a method that exists inside prismic. it is for me to search for any document by its UID (which is exactly the slug). I pass the type of the document I want to fetch and pass the value
 
   const post = {
     slug,
@@ -61,6 +71,8 @@ export const getServerSideProps: GetServerSideProps = async ({
       }
     ),
   };
+
+  console.log(session);
 
   return {
     props: { post },

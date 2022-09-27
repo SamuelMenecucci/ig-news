@@ -1,5 +1,6 @@
 import { GetStaticProps } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import { getPrismicClient } from "../../services/prismic";
 import styles from "./styles.module.scss";
 
@@ -24,11 +25,13 @@ export default function Posts({ posts }: PostsProps) {
       <main className={styles.container}>
         <div className={styles.posts}>
           {posts?.map((element) => (
-            <a key={element.slug} href="">
-              <time>{element.updatedAt} </time>
-              <strong>{element.title}</strong>
-              <p>{element.excerpt}</p>
-            </a>
+            <Link href={`/posts/${element.slug}`}>
+              <a key={element.slug}>
+                <time>{element.updatedAt} </time>
+                <strong>{element.title}</strong>
+                <p>{element.excerpt}</p>
+              </a>
+            </Link>
           ))}
         </div>
       </main>
